@@ -10,5 +10,6 @@ name = "vesselc"
 path = "src/main.rs"
 
 [dependencies]
-# No external deps for core compiler -- stdlib only.
-# Future: add 'inkwell' for LLVM IR generation.
+# Core compiler: stdlib only.
+# Native codegen: inkwell wraps LLVM 19 safely.
+inkwell = { version = "0.9.0", features = ["llvm19-1"] }

@@ -7,6 +7,7 @@ mod constants;
 mod error;
 mod kappa_infer;
 mod lexer;
+mod llvm_codegen;
 mod parser;
 
 use std::env;
@@ -34,6 +35,12 @@ fn compile(source: &str, target: &str) -> Result<String, error::VesselError> {
     ki.infer(&program)?;
 
     // Phase 4: CodeGen
+    if target == "native" {
+        // Native path: emit object file via inkwell, return empty string
+        // (caller writes the .o file directly)
+        return Ok(String::from("__native__"));
+    }
+
     let output = match target {
         "llvm" => codegen::emit_llvm_ir_stub(&program),
         _      => CodeGen::new(&program, &ki).emit()?,
@@ -78,6 +85,43 @@ fn main() {
             process::exit(1);
         }
     };
+
+    // Native target: bypass compile() and call llvm_codegen directly
+    if target == "native" {
+        use lexer::Lexer;
+        use parser::Parser;
+        use kappa_infer::KappaInfer;
+
+        let mut lex = Lexer::new(&source);
+        let tokens = match lex.tokenize() {
+            Ok(t) => t,
+            Err(e) => { eprintln!("vesselc error: {e}"); process::exit(1); }
+        };
+        let mut par = Parser::new(tokens);
+        let program = match par.parse() {
+            Ok(p) => p,
+            Err(e) => { eprintln!("vesselc error: {e}"); process::exit(1); }
+        };
+        let mut ki = KappaInfer::new();
+        if let Err(e) = ki.infer(&program) {
+            eprintln!("vesselc error: {e}"); process::exit(1);
+        }
+        let obj_str = out_path.unwrap_or("vessel_out.o");
+        let obj_path = std::path::Path::new(obj_str);
+        let bin_path = obj_path.with_extension("");
+        if let Err(e) = llvm_codegen::compile_to_object(&program, &ki, obj_path) {
+            eprintln!("vesselc native error: {e}"); process::exit(1);
+        }
+        let status = std::process::Command::new("clang-19")
+            .args([obj_str, "-o", bin_path.to_str().unwrap(), "-lm"])
+            .status();
+        match status {
+            Ok(s) if s.success() => println!("vesselc: binary -> {}", bin_path.display()),
+            Ok(s) => { eprintln!("vesselc: clang-19 {s}"); process::exit(1); }
+            Err(e) => { eprintln!("vesselc: clang-19 not found: {e}"); process::exit(1); }
+        }
+        return;
+    }
 
     match compile(&source, target) {
         Ok(output) => {
