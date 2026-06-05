@@ -1,0 +1,4 @@
+-- P04: law with forall quantifier
+vessel A { kappa: 0.2, boundary: 0.2 }
+vessel B { kappa: 0.8, boundary: 0.8 }
+law non_negative { forall v: v >= 0.0 }

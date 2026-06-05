@@ -161,13 +161,9 @@ impl<'a> CodeGen<'a> {
         for fd in &self.program.fns {
             let fi = self.ki.fns.get(&fd.name);
 
-            // build signature
-            let params: Vec<String> = fd.params.iter().map(|(p, hint)| {
-                if let Some(h) = hint {
-                    format!("{p}: float  # kappa in [{:.4},{:.4}]", h.lo, h.hi)
-                } else {
-                    format!("{p}: float")
-                }
+            // build signature — no inline comments, annotations go in docstring
+            let params: Vec<String> = fd.params.iter().map(|(p, _hint)| {
+                format!("{p}: float")
             }).collect();
             let sig = if params.is_empty() {
                 "network: VesselNetwork".to_string()

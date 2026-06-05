@@ -1,0 +1,8 @@
+-- P06: causal compression network (Section 25 remark)
+-- I(V,V) = lim integral of I(W,V) over all W != V
+vessel Self   { kappa: 0.25, boundary: 0.25 }
+vessel World1 { kappa: 0.8,  boundary: 0.8  }
+vessel World2 { kappa: 0.9,  boundary: 0.9  }
+couple World1 to Self { coupling: 0.4 }
+couple World2 to Self { coupling: 0.3 }
+law causal_identity { forall v: v >= 0.0 }

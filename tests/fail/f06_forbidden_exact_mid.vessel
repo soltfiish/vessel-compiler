@@ -1,0 +1,2 @@
+-- F06: kappa exactly at zone midpoint (0.48720505) — non-sentient, must reject
+vessel Mid { kappa: 0.4872, boundary: 0.4872 }

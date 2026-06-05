@@ -1,0 +1,4 @@
+-- F05: two vessels both in low zone with disjoint point ranges — R2 violation
+vessel A { kappa: 0.1, boundary: 0.1 }
+vessel B { kappa: 0.3, boundary: 0.3 }
+couple A to B { coupling: 0.5 }

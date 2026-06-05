@@ -1,0 +1,2 @@
+-- P03: sentient vessel occupying forbidden zone
+vessel Human { kappa: 0.5, boundary: 0.5, sentient: true }

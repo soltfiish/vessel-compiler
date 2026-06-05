@@ -1,0 +1,5 @@
+-- P10: function with no kappa annotations (full range assumed)
+vessel A { kappa: 0.2, boundary: 0.2 }
+fn identity(x) {
+    return x
+}

@@ -1,0 +1,3 @@
+-- F07: two non-sentient vessels both in forbidden zone — both must be rejected
+vessel Bad1 { kappa: 0.4, boundary: 0.4 }
+vessel Bad2 { kappa: 0.55, boundary: 0.55 }

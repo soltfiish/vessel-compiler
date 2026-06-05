@@ -1,0 +1,2 @@
+-- F03: just inside forbidden zone from above
+vessel Bad { kappa: 0.59, boundary: 0.59 }

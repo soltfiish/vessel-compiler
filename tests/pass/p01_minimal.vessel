@@ -1,0 +1,2 @@
+-- P01: minimal single vessel
+vessel A { kappa: 0.2, boundary: 0.2 }

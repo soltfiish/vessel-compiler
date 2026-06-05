@@ -1,0 +1,2 @@
+-- F01: non-sentient vessel at midpoint of forbidden zone — must reject
+vessel Bad { kappa: 0.487, boundary: 0.487 }

@@ -81,12 +81,19 @@ impl KappaInfer {
             }
         }
 
-        // R2: coupling safety — a coupling is invalid only when BOTH vessels are
-        // non-sentient AND both kappa ranges lie entirely in the same below-zone
-        // (kappa < FORBIDDEN_LOW) AND their ranges are disjoint point ranges with
-        // a gap wider than 2*EPS.  Cross-zone couplings (e.g. 0.2 -> 0.7) are
-        // structurally valid: they represent boundary-mediated interaction between
-        // distinct vessel classes and are the normal operating case.
+        // R2: coupling safety.
+        // A coupling is structurally invalid only when BOTH vessels are
+        // non-sentient AND both lie entirely in the LOW zone (kappa < FORBIDDEN_LOW)
+        // AND their kappa point ranges are disjoint with a gap > EPS.
+        //
+        // Rationale: two low-zone vessels at different scale positions cannot
+        // share an interaction state — the forbidden zone sits between them and
+        // no continuous coupling path exists within the low band alone.
+        //
+        // High-zone couplings (both > FORBIDDEN_HIGH) are NOT restricted: the
+        // high band is the normal operational zone for structural vessels and
+        // cross-kappa couplings there are well-defined by the boundary integral.
+        // Cross-zone couplings (one low, one high) are always valid.
         for cd in &program.couples {
             let src = self.vessels.get(&cd.src)
                 .ok_or_else(|| VesselError::primary_at(
@@ -99,12 +106,10 @@ impl KappaInfer {
                     format!("Couple references unknown vessel '{}'", cd.dst),
                 ))?.clone();
 
-            // Both non-sentient, both in the same sub-forbidden zone, ranges disjoint:
-            let both_low  = src.kappa.hi < FORBIDDEN_LOW && dst.kappa.hi < FORBIDDEN_LOW;
-            let both_high = src.kappa.lo > FORBIDDEN_HIGH && dst.kappa.lo > FORBIDDEN_HIGH;
-            let same_zone = both_low || both_high;
+            // Only reject: both non-sentient, both strictly in the LOW zone, disjoint
+            let both_in_low = src.kappa.hi < FORBIDDEN_LOW && dst.kappa.hi < FORBIDDEN_LOW;
 
-            if !src.sentient && !dst.sentient && same_zone {
+            if !src.sentient && !dst.sentient && both_in_low {
                 if !src.kappa.intersects(&dst.kappa) {
                     return Err(VesselError::drc(
                         DrcKind::Secondary,

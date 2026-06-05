@@ -1,0 +1,6 @@
+-- P05: function with R7 param and R8 return annotation
+vessel A { kappa: 0.2, boundary: 0.2 }
+fn scale(x: <0.0, 0.35>) -> <0.0, 0.4> {
+    let y = x + 0.05
+    return y
+}

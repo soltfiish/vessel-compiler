@@ -1,0 +1,19 @@
+-- P07: full network with vessels, couples, laws, and functions
+vessel Earth { kappa: 0.25, boundary: 0.25 }
+vessel Sky   { kappa: 0.75, boundary: 0.75 }
+vessel Sun   { kappa: 0.9,  boundary: 0.9  }
+
+couple Earth to Sky { coupling: 0.3 }
+couple Sky   to Sun { coupling: 0.2 }
+
+law scale_bound { forall v: v >= 0.0 }
+law upper_bound { forall v: v <= 1.0 }
+
+fn normalize(x: <0.0, 1.0>) -> <0.0, 1.0> {
+    return x
+}
+
+fn shift(x: <0.0, 0.35>) -> <0.0, 0.4> {
+    let y = x + 0.05
+    return y
+}

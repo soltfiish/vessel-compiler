@@ -1,0 +1,4 @@
+-- P02: two vessels, cross-zone coupling
+vessel Earth { kappa: 0.25, boundary: 0.25 }
+vessel Sky   { kappa: 0.75, boundary: 0.75 }
+couple Earth to Sky { coupling: 0.3 }

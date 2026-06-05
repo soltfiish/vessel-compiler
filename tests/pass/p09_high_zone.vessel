@@ -1,0 +1,4 @@
+-- P09: vessels exclusively in high zone (kappa > FORBIDDEN_HIGH)
+vessel Alpha { kappa: 0.7,  boundary: 0.7  }
+vessel Beta  { kappa: 0.85, boundary: 0.85 }
+couple Alpha to Beta { coupling: 0.5 }
