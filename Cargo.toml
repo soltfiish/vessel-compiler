@@ -1,0 +1,14 @@
+[package]
+name = "vessel_compiler"
+version = "0.1.0"
+edition = "2021"
+description = "Vessel: A Programming Language Derived from Scale Calculus"
+authors = ["Solt (Ayokunle Olufosoye) <ayolufosoye@gmail.com>"]
+
+[[bin]]
+name = "vesselc"
+path = "src/main.rs"
+
+[dependencies]
+# No external deps for core compiler -- stdlib only.
+# Future: add 'inkwell' for LLVM IR generation.
