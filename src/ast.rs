@@ -33,13 +33,14 @@ pub struct Program {
     pub fns:     Vec<FnDecl>,
 }
 
-/// `vessel <name> { kappa: <expr>, boundary: <expr>, sentient: <bool> }`
+/// `vessel <name> { kappa: <expr>, boundary: <expr>, sentient: <bool>, observer: <bool> }`
 #[derive(Debug, Clone)]
 pub struct VesselDecl {
     pub name:     String,
     pub kappa:    Expr,
     pub boundary: Expr,
     pub sentient: bool,
+    pub observer: bool,
     pub line:     usize,
 }
 

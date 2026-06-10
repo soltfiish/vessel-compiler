@@ -412,4 +412,34 @@ fn scale(x: <0.0, 0.35>) -> <0.0, 0.4> {
         assert!(output.contains("def scale"));
         assert!(output.contains("def phi_rebalance"));
     }
+
+    // ------------------------------------------------------------------ T21: observer vessel compiles
+
+    #[test]
+    fn t21_observer_vessel_compiles() {
+        let src = "vessel Watcher { kappa: 0.2, boundary: 0.2, observer: true }";
+        let output = ok(src);
+        assert!(output.contains("Watcher_kappa"));
+        // observer flag should appear in generated output
+        assert!(output.contains("Watcher_observer: bool  = True"));
+    }
+
+    // ------------------------------------------------------------------ T22: observer + sentient mutual exclusion
+
+    #[test]
+    fn t22_observer_sentient_mutually_exclusive() {
+        let src = "vessel Bad { kappa: 0.2, boundary: 0.2, observer: true, sentient: true }";
+        err_contains(src, "error[E-OBS-SENT]");
+    }
+
+    // ------------------------------------------------------------------ T23: neither attribute compiles (regression)
+
+    #[test]
+    fn t23_neither_attribute_compiles() {
+        let src = "vessel Plain { kappa: 0.2, boundary: 0.2 }";
+        let output = ok(src);
+        assert!(output.contains("Plain_kappa"));
+        assert!(!output.contains("Plain_observer"));
+        assert!(!output.contains("Plain_sentient"));
+    }
 }

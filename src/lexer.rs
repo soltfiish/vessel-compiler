@@ -11,7 +11,7 @@ pub enum TokenKind {
     Ident(String),
     // Keywords
     Vessel, Boundary, Couple, To, Resign, Rebalance,
-    Sentient, Law, Let, Fn, Return, If, Else, Forall,
+    Sentient, Observer, Law, Let, Fn, Return, If, Else, Forall,
     True, False, And, Or, Not,
     // Symbols
     LParen, RParen, LBrace, RBrace,
@@ -93,6 +93,7 @@ impl Lexer {
             "resign"    => TokenKind::Resign,
             "rebalance" => TokenKind::Rebalance,
             "sentient"  => TokenKind::Sentient,
+            "observer"  => TokenKind::Observer,
             "law"       => TokenKind::Law,
             "let"       => TokenKind::Let,
             "fn"        => TokenKind::Fn,

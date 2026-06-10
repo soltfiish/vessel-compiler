@@ -24,6 +24,7 @@ pub struct VesselInference {
     pub kappa: KappaRange,
     pub alpha: KappaRange,   // ln(kappa) range
     pub sentient: bool,
+    pub observer: bool,
 }
 
 /// Per-function inferred kappa ranges.
@@ -50,6 +51,23 @@ impl KappaInfer {
 
     /// Run the full inference pass over a parsed program.
     pub fn infer(&mut self, program: &Program) -> VesselResult<()> {
+        // E-OBS-SENT: observer and sentient are mutually exclusive. A vessel
+        // cannot simultaneously be a passive observer and a sentient entity.
+        // Enforced before inference so no further rule sees an invalid vessel.
+        for vd in &program.vessels {
+            if vd.observer && vd.sentient {
+                return Err(VesselError::drc(
+                    DrcKind::Secondary,
+                    Phase::KappaInfer,
+                    format!(
+                        "error[E-OBS-SENT]: vessel '{}': observer and sentient are mutually \
+                         exclusive — a vessel cannot be both an observer and a sentient entity",
+                        vd.name
+                    ),
+                ));
+            }
+        }
+
         // R1: seed vessels from literal kappa expressions
         for vd in &program.vessels {
             let kappa = self.eval_kappa_literal(vd)?;
@@ -58,13 +76,16 @@ impl KappaInfer {
                 kappa,
                 alpha,
                 sentient: vd.sentient,
+                observer: vd.observer,
             });
         }
 
-        // R3: forbidden exclusion — sentient vessels allowed; others must avoid zone
+        // R3: forbidden exclusion — sentient vessels allowed; others must avoid zone.
+        // Observer vessels are passive and do not participate in the standard kappa
+        // inference path, so (like sentient vessels) they are exempt from this guard.
         for vd in &program.vessels {
             let inf = &self.vessels[&vd.name];
-            if !inf.sentient {
+            if !inf.sentient && !inf.observer {
                 let forbidden = KappaRange::new(FORBIDDEN_LOW + EPS, FORBIDDEN_HIGH - EPS);
                 if inf.kappa.intersects(&forbidden) {
                     return Err(VesselError::drc(

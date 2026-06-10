@@ -80,9 +80,10 @@ impl<'a> CodeGen<'a> {
             let klo = inf.map(|i| i.kappa.lo).unwrap_or(0.0);
             let khi = inf.map(|i| i.kappa.hi).unwrap_or(1.0);
             let sentient = if vd.sentient { "True" } else { "False" };
+            let observer = if vd.observer { "True" } else { "False" };
             self.line(&format!(
-                "# {} | kappa range: [{:.4}, {:.4}] | sentient: {}",
-                vd.name, klo, khi, sentient
+                "# {} | kappa range: [{:.4}, {:.4}] | sentient: {} | observer: {}",
+                vd.name, klo, khi, sentient, observer
             ));
             // emit kappa literal as default field value
             let kv = expr_to_python(&vd.kappa);
@@ -93,6 +94,9 @@ impl<'a> CodeGen<'a> {
             if vd.sentient {
                 self.line(&format!("{}_sentient: bool  = True", vd.name));
             }
+            if vd.observer {
+                self.line(&format!("{}_observer: bool  = True", vd.name));
+            }
             self.line("");
         }
 
@@ -100,7 +104,7 @@ impl<'a> CodeGen<'a> {
         self.line("def __post_init__(self) -> None:");
         self.indent();
         for vd in &self.program.vessels {
-            if !vd.sentient {
+            if !vd.sentient && !vd.observer {
                 self.line(&format!(
                     "_check_kappa({:?}, self.{}_kappa)",
                     vd.name, vd.name
@@ -273,7 +277,7 @@ impl<'a> CodeGen<'a> {
             self.line("# nudge each vessel kappa toward boundary");
             for vd in &self.program.vessels {
                 let n = &vd.name;
-                if !vd.sentient {
+                if !vd.sentient && !vd.observer {
                     self.line(&format!(
                         "network.{n}_kappa -= 0.01 * phi / {n}",
                         n = n

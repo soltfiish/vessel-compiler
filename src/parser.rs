@@ -83,6 +83,7 @@ impl Parser {
             TokenKind::Couple     => Ok("couple".into()),
             TokenKind::Vessel     => Ok("vessel".into()),
             TokenKind::Sentient   => Ok("sentient".into()),
+            TokenKind::Observer   => Ok("observer".into()),
             TokenKind::Resign     => Ok("resign".into()),
             TokenKind::Rebalance  => Ok("rebalance".into()),
             TokenKind::Law        => Ok("law".into()),
@@ -130,6 +131,7 @@ impl Parser {
         let mut kappa:    Option<Expr>  = None;
         let mut boundary: Option<Expr>  = None;
         let mut sentient: bool          = false;
+        let mut observer: bool          = false;
 
         while !self.check(&TokenKind::RBrace) && !self.check(&TokenKind::Eof) {
             let field = self.eat_field_name()?;
@@ -141,6 +143,11 @@ impl Parser {
                     // accept `true` / `false` keyword
                     let v = self.advance().kind.clone();
                     sentient = matches!(v, TokenKind::True);
+                }
+                "observer" => {
+                    // accept `true` / `false` keyword
+                    let v = self.advance().kind.clone();
+                    observer = matches!(v, TokenKind::True);
                 }
                 _ => { self.parse_expr()?; /* ignore unknown fields */ }
             }
@@ -154,6 +161,7 @@ impl Parser {
             kappa:    kappa.unwrap_or(Expr::FloatLit(0.5)),
             boundary: boundary.unwrap_or(Expr::FloatLit(0.5)),
             sentient,
+            observer,
             line,
         })
     }
